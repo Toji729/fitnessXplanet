@@ -1,0 +1,101 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isEmailVerified() {
+      return request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- 1. Users Collection ---
+    match /users/{userId} {
+      function isValidUser(data) {
+        return data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+               data.email is string && data.email.size() > 0 && data.email.size() <= 100 &&
+               data.calorieGoal is number && data.calorieGoal > 0 && data.calorieGoal <= 10000;
+      }
+
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(incoming()) && 
+                       incoming().keys().hasAll(['name', 'email', 'calorieGoal']);
+      allow update: if isOwner(userId) && isValidUser(incoming()) && (
+        // Only allow certain fields to be updated by the user
+        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'height', 'weight', 'activityLevel', 'calorieGoal', 'photoURL'])
+      );
+
+      // --- 2. Meals Subcollection ---
+      match /meals/{mealId} {
+        function isValidMeal(data) {
+          return data.foodName is string && data.foodName.size() > 0 && data.foodName.size() <= 200 &&
+                 data.calories is number && data.calories >= 0 && data.calories <= 5000 &&
+                 data.protein is number && data.protein >= 0 && data.protein <= 500 &&
+                 data.carbs is number && data.carbs >= 0 && data.carbs <= 1000 &&
+                 data.fat is number && data.fat >= 0 && data.fat <= 500 &&
+                 data.timestamp is string && data.timestamp.size() > 0 &&
+                 data.mealType in ['breakfast', 'lunch', 'dinner', 'snack'];
+        }
+
+        allow list: if isOwner(userId);
+        allow get: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidMeal(incoming());
+        allow delete: if isOwner(userId);
+      }
+
+      // --- 3. Habits Subcollection ---
+      match /habits/{habitId} {
+        function isValidHabit(data) {
+          return data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+                 data.completed is bool &&
+                 data.userId == userId;
+        }
+
+        allow list: if isOwner(userId);
+        allow get: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidHabit(incoming());
+        allow update: if isOwner(userId) && isValidHabit(incoming()) && (
+          incoming().diff(existing()).affectedKeys().hasOnly(['completed', 'streak', 'lastCompletedAt'])
+        );
+        allow delete: if isOwner(userId);
+      }
+
+      // --- 4. Moods Subcollection ---
+      match /moods/{moodId} {
+        function isValidMood(data) {
+          return data.emoji is string && data.emoji.size() > 0 &&
+                 data.label is string && data.label.size() > 0 &&
+                 data.timestamp is string;
+        }
+
+        allow list: if isOwner(userId);
+        allow get: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidMood(incoming());
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

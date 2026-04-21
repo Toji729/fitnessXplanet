@@ -1,0 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  
+  --color-primary-green: #10B981;
+  --color-primary-dark: #059669;
+  --color-accent-amber: #F59E0B;
+  --color-danger-red: #F43F5E;
+  
+  --color-bg-light: #FFFFFF;
+  --color-bg-dark: #0A0C10;
+  
+  --color-card-light: #FFFFFF;
+  --color-card-dark: #11141B;
+  
+  --color-border-light: #F1F5F9;
+  --color-border-dark: #1E293B;
+  
+  --color-main: var(--text-primary);
+  --color-muted: var(--text-secondary);
+
+  --shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-button: 0 4px 20px rgba(29,158,117,0.3);
+  --shadow-glow: 0 0 20px rgba(29,158,117,0.2);
+}
+
+@layer base {
+  :root {
+    --text-primary: #0F172A;
+    --text-secondary: #64748B;
+  }
+
+  .dark {
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+  }
+
+  body {
+    @apply bg-[var(--color-bg-light)] text-[var(--color-main)] antialiased min-h-screen font-sans transition-colors duration-300;
+  }
+  
+  .dark body {
+    @apply bg-[var(--color-bg-dark)] text-[var(--color-main)];
+    background-image: radial-gradient(circle at top right, rgba(29, 158, 117, 0.07), transparent 600px);
+  }
+}
+
+@layer components {
+  .elite-card {
+    @apply bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark rounded-[24px] shadow-card transition-all duration-300 hover:border-primary-green/40 hover:shadow-hover;
+  }
+  
+  .elite-button-primary {
+    @apply bg-primary-green hover:bg-primary-dark text-white font-bold py-3.5 px-6 rounded-[16px] shadow-button transition-all duration-300 active:scale-95 hover:shadow-glow;
+  }
+  
+  .nav-item-active {
+    @apply bg-primary-green/10 text-primary-green rounded-2xl font-bold px-4 py-3 flex items-center gap-3 relative overflow-hidden;
+  }
+  
+  .nav-item-active::after {
+    content: '';
+    @apply absolute left-0 top-0 w-1 h-full bg-primary-green rounded-full;
+  }
+
+  .nav-item-inactive {
+    @apply text-muted hover:bg-white dark:hover:bg-card-dark rounded-2xl transition-all duration-300 font-semibold px-4 py-3 flex items-center gap-3 hover:text-primary-green;
+  }
+
+  .elite-input {
+    @apply bg-white dark:bg-card-dark/50 dark:backdrop-blur-md border border-border-light dark:border-border-dark rounded-[16px] px-5 py-3 focus:outline-none focus:ring-4 focus:ring-primary-green/10 focus:border-primary-green transition-all duration-300 dark:text-white placeholder:text-muted/50;
+  }
+
+  .glass-header {
+    @apply sticky top-0 md:relative z-40 bg-white border-b border-border-light dark:bg-card-dark dark:border-border-dark h-[72px];
+  }
+
+  /* Futuristic Utilities */
+  .futuristic-glow {
+    box-shadow: 0 0 20px rgba(29, 158, 117, 0.15), inset 0 0 10px rgba(29, 158, 117, 0.05);
+  }
+
+  .scanline-overlay {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .scanline-overlay::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.005), rgba(0, 0, 255, 0.01));
+    z-index: 2;
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+    opacity: 0.1;
+  }
+
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto;
+    gap: 1.5rem;
+  }
+}
+
+
+/* Custom Animations */
+@keyframes ripple {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(29, 158, 117, 0.3);
+  animation: ripple 0.8s ease-out;
+  pointer-events: none;
+}
+
+/* Shimmer */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-border-light dark:bg-border-dark rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary-green/40;
+}
+

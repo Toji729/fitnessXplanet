@@ -1,0 +1,79 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User preferences and health stats",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "height": { "type": "number", "description": "in cm" },
+        "weight": { "type": "number", "description": "in kg" },
+        "activityLevel": { "type": "string", "enum": ["sedentary", "light", "moderate", "active", "extra_active"] },
+        "calorieGoal": { "type": "number" },
+        "memberSince": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "calorieGoal"]
+    },
+    "Meal": {
+      "title": "Meal Record",
+      "description": "Daily food intake record",
+      "type": "object",
+      "properties": {
+        "foodName": { "type": "string" },
+        "calories": { "type": "number" },
+        "protein": { "type": "number" },
+        "carbs": { "type": "number" },
+        "fat": { "type": "number" },
+        "mealType": { "type": "string", "enum": ["breakfast", "lunch", "snack", "dinner"] },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "userId": { "type": "string" }
+      },
+      "required": ["foodName", "calories", "userId", "timestamp"]
+    },
+    "Habit": {
+      "title": "Habit Tracking",
+      "description": "Daily habits to build routines",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "completed": { "type": "boolean" },
+        "streak": { "type": "number" },
+        "userId": { "type": "string" },
+        "lastCompletedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "userId"]
+    },
+    "Mood": {
+      "title": "Mood Entry",
+      "description": "Mental health and mood tracking",
+      "type": "object",
+      "properties": {
+        "emoji": { "type": "string" },
+        "label": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "userId": { "type": "string" }
+      },
+      "required": ["emoji", "userId", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile data"
+    },
+    "/users/{userId}/meals/{mealId}": {
+      "schema": "Meal",
+      "description": "User meal logs"
+    },
+    "/users/{userId}/habits/{habitId}": {
+      "schema": "Habit",
+      "description": "User habit definitions and status"
+    },
+    "/users/{userId}/moods/{moodId}": {
+      "schema": "Mood",
+      "description": "User mood logs"
+    }
+  }
+}
